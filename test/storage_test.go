@@ -22,22 +22,22 @@ type TestStruct struct {
 }
 
 func TestInit(t *testing.T) {
-	storage.Init(slog.Default())
+	storage.Init(slog.Default(), testDB)
 }
 
 var collection *mongo.Collection
 
 func TestGetDB(t *testing.T) {
-	// Connect and drop db.
-	db := storage.GetDB(testDB)
-	err := db.Drop(context.Background())
+	// Connect and drop collection.
+	newCollection := storage.GetCollection(testCollection)
+	err := newCollection.Drop(context.Background())
 	if err != nil {
 		t.Errorf("Error on getting database: %v", err)
 		panic(err)
 	}
 
 	// Create empty collection.
-	collection = db.Collection(testCollection)
+	collection = newCollection
 }
 
 func TestGetEmptyCollection(t *testing.T) {

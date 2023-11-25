@@ -8,7 +8,7 @@ import (
 
 func main() {
 	log := setupLogger()
-	storage.Init(log)
+	storage.Init(log, "testingSystem")
 }
 
 func setupLogger() *slog.Logger {

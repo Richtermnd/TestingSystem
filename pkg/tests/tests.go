@@ -4,22 +4,25 @@ import (
 	"reflect"
 	"slices"
 	"strings"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Question of Test
 type Question struct {
-	N             int      `json:"n"`             // Number of question
-	Text          string   `json:"text"`          // Text of question.
-	Variants      []string `json:"variants"`      // Variants of anwers.
-	Answers       []string `json:"answers"`       // Correct answers.
-	IsMultiAnswer bool     `json:"isMultiAnswer"` // Is question a multianswer. It's usefull for frontend.
+	N             int      `json:"n" bson:"n"`                         // Number of question
+	Text          string   `json:"text" bson:"text"`                   // Text of question.
+	Variants      []string `json:"variants" bson:"variants"`           // Variants of anwers.
+	Answers       []string `json:"answers" bson:"answers"`             // Correct answers.
+	IsMultiAnswer bool     `json:"isMultiAnswer" bson:"isMultiAnswer"` // Is question a multianswer. It's usefull for frontend.
 }
 
 // Test
 type Test struct {
-	Title     string     `json:"title"`     // Test title.
-	AuthorId  string     `json:"authorID"`  // Author id.
-	Questions []Question `json:"questions"` // Questions slice.
+	ID        *primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Title     string              `json:"title" bson:"title"`         // Test title.
+	AuthorId  string              `json:"authorID" bson:"authorID"`   // Author id.
+	Questions []Question          `json:"questions" bson:"questions"` // Questions slice.
 }
 
 // Return all answers for test.
