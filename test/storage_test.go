@@ -30,9 +30,8 @@ var collection *mongo.Collection
 func TestGetDB(t *testing.T) {
 	// Connect and drop collection.
 	newCollection := storage.GetCollection(testCollection)
-	err := newCollection.Drop(context.Background())
-	if err != nil {
-		t.Errorf("Error on getting database: %v", err)
+	if err := newCollection.Drop(context.Background()); err != nil {
+		t.Errorf("Error on getting collection: %v", err)
 		panic(err)
 	}
 

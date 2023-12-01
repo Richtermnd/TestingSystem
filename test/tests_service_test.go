@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"reflect"
@@ -12,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var s service.TestService = *service.New(slog.Default())
+var s service.TestService = *service.NewTestService(slog.Default())
 var createdIDs []*primitive.ObjectID
 
 func TestCreate(t *testing.T) {
@@ -51,11 +50,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 		}
-		data, err := json.Marshal(newTest)
-		if err != nil {
-			t.Error(err)
-		}
-		id, err := s.Create(data)
+		id, err := s.Create(newTest)
 		if err != nil {
 			t.Error(err)
 		}
@@ -74,15 +69,9 @@ func TestUpdate(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		t.Log("Marshalling test to json")
-		test.Title = test.Title + " Xd"
-		data, err := json.Marshal(test)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+		test.Title += " xd"
 		t.Log("Update test")
-		updatedId, err := s.Update(id, data)
+		updatedId, err := s.Update(id, *test)
 		if err != nil {
 			t.Error(err)
 			continue

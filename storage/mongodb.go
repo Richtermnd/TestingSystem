@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"log/slog"
-	"time"
+	// "time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -36,12 +36,19 @@ func Init(log *slog.Logger, dbName string) {
 
 	// Connect to mongo
 	log.Info("Connecting to mongo")
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoURI))
+	// ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
+	// defer cancel()
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.MongoURI))
 	if err != nil {
 		panic(err)
 	}
+	// defer func() {
+	// 	log.Info("Disconnecting")
+	// 	if err := client.Disconnect(context.TODO()); err != nil {
+	// 		log.Error(err.Error())
+	// 		panic(err)
+	// 	}
+	// }()
 
 	// Make client global for package
 	log.Info("Succesfull connect.")

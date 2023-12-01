@@ -7,8 +7,9 @@ import (
 
 type IService[T any] interface {
 	getCollection() *mongo.Collection
-	Create(data []byte) (T, error)
-	Read(id primitive.ObjectID) (*T, error)
-	Update(id primitive.ObjectID, newValues map[string]interface{}) (T, error)
-	Delete(id primitive.ObjectID) error
+	Create(T) (*primitive.ObjectID, error)
+	ReadOne(*primitive.ObjectID) (*T, error)
+	ReadAll() ([]*T, error)
+	Update(*primitive.ObjectID, T) (*primitive.ObjectID, error)
+	Delete(*primitive.ObjectID) (bool, error)
 }

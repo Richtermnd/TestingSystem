@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log/slog"
 
@@ -11,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type TestService struct {
@@ -22,12 +20,8 @@ func (t *TestService) getCollection() *mongo.Collection {
 	return storage.GetCollection("tests")
 }
 
-func (t *TestService) Create(data []byte) (*primitive.ObjectID, error) {
+func (t *TestService) Create(newTest tests.Test) (*primitive.ObjectID, error) {
 	t.log.Info("Creating test")
-	var newTest *tests.Test
-	if err := json.Unmarshal(data, &newTest); err != nil {
-		return nil, err
-	}
 	collection := t.getCollection()
 	res, err := collection.InsertOne(context.TODO(), newTest)
 	if err != nil {
@@ -38,7 +32,6 @@ func (t *TestService) Create(data []byte) (*primitive.ObjectID, error) {
 	if !ok {
 		return nil, errors.New("idk")
 	}
-	// s := id.String()
 	t.log.Info("Test created.", "id", id.String())
 	return &id, nil
 }
@@ -53,42 +46,23 @@ func (t *TestService) ReadOne(id *primitive.ObjectID) (*tests.Test, error) {
 	return &test, nil
 }
 
-func (t *TestService) ReadAll(
-	id primitive.ObjectID,
-	offset, limit int,
-	filters map[string]interface{},
-) ([]*tests.Test, error) {
+func (t *TestService) ReadAll() ([]*tests.Test, error) {
 	collection := t.getCollection()
 	var tests []*tests.Test
-	var bsonFilters bson.D
-	options := options.Find().SetSkip(int64(offset)).SetLimit(int64(limit))
-	// Linter hates me if I use filters != nil...
-	if filters == nil {
-	} else {
-		for k, v := range filters {
-			bsonFilters = append(bsonFilters, bson.E{k, v})
-		}
-	}
-	cursor, err := collection.Find(context.TODO(), bsonFilters, options)
+	t.log.Info("Getting all tests")
+	cursor, err := collection.Find(context.TODO(), bson.D{})
 	if err != nil {
 		return nil, err
 	}
-	if err := cursor.All(context.TODO(), tests); err != nil {
+	if err := cursor.All(context.TODO(), &tests); err != nil {
 		return nil, err
 	}
 	return tests, nil
 }
 
-func (t *TestService) Update(id *primitive.ObjectID, data []byte) (*primitive.ObjectID, error) {
-	var newTest tests.Test
-	err := json.Unmarshal(data, &newTest)
-	if err != nil {
-		return nil, err
-	}
+func (t *TestService) Update(id *primitive.ObjectID, newTest tests.Test) (*primitive.ObjectID, error) {
 	collection := t.getCollection()
 	res, err := collection.ReplaceOne(context.TODO(), bson.D{{"_id", id}}, newTest)
-	// t.log.Info(slog.Attr("res", res.UpsertedID.String()))
-	// log.Println()
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +86,6 @@ func (t *TestService) Delete(id *primitive.ObjectID) (bool, error) {
 	return res.DeletedCount == 1, nil
 }
 
-func New(log *slog.Logger) *TestService {
+func NewTestService(log *slog.Logger) *TestService {
 	return &TestService{log}
 }
