@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/Richtermnd/TestingSystem/pkg/tests"
+	"github.com/Richtermnd/TestingSystem/testingSystem"
 )
 
 func TestCheck(t *testing.T) {
@@ -118,7 +118,7 @@ func TestCheck(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		res := test.InputAnswers.Check(test.Test)
+		res := test.InputAnswers.Check(&test.Test)
 		if res != test.Expected {
 			t.Errorf("%s failed", test.Name)
 		}
